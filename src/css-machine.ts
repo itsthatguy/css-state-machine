@@ -7,8 +7,9 @@ type CSSTuple = [SHA, CSS]
 
 export default class CSSMachine {
   static parse = flatten;
+  static cssCache: CSSTuple[] = [];
 
-  // returns a touple: [SHA, CSS]
+  // returns a tuple: [SHA, CSS]
   static generateCSS (selector: Selector, css: CSS): CSSTuple {
     const SHA = this.generateSHA(css);
     return [SHA, this.parse(`
@@ -29,26 +30,56 @@ export default class CSSMachine {
     return 'csm-' + (hash >>> 0).toString(16);
   }
 
+  static cacheExists(SHA) {
+    for (let tuple of this.cssCache) {
+      if (tuple[0] == SHA) return true
+    }
+  }
+
+  static addCache(tuple) {
+    const exists = this.cacheExists(tuple[1]);
+    if (!exists) this.cssCache.push(tuple);
+  }
+
+  static removeCache(tuple) {
+    const newCache = this.cssCache.filter(([sha, _]) => sha !== tuple[0]);
+    this.cssCache = newCache
+    return this.cssCache;
+  }
+
   static inject(selector, css) {
-    const [SHA, CSS] = this.generateCSS(selector, css);
+    const tuple = this.generateCSS(selector, css);
+    this.addCache(tuple);
+    this.updateStyle();
+  }
+
+  static eject(selector, css) {
+    const tuple = this.generateCSS(selector, css);
+    this.removeCache(tuple);
+    this.updateStyle();
+  }
+
+  static updateStyle() {
     const head = document.getElementsByTagName('head')[0];
-    const existingStyle = document.querySelector(`style.${SHA}`);
+    const cssContent: CSS = this.cssCache.reduce((result, [_, css]) => result + css, '');
 
-    if (existingStyle) head.removeChild(existingStyle);
+    const existingStyle = document.querySelector(`style.csm`);
 
-    const style = document.createElement('style');
+    const style = existingStyle || document.createElement('style');
     style.setAttribute('type', 'text/css');
-    style.className = SHA;
-    style.textContent = CSS;
+    style.className = 'csm';
+    style.textContent = cssContent;
 
     head.appendChild(style);
   }
 
-  static eject(selector, css) {
-    const [SHA] = this.generateCSS(selector, css);
-    const head = document.getElementsByTagName('head')[0];
-    const existingStyle = document.querySelector(`style.${SHA}`);
+  static addClass(selector: Selector, sha: SHA) {
+    const elem = document.querySelector(selector);
+    return elem.classList.add(sha);
+  }
 
-    if (existingStyle) head.removeChild(existingStyle);
+  static removeClass(selector: Selector , sha: SHA) {
+    const elem = document.querySelector(selector);
+    return elem.classList.remove(sha);
   }
 }
