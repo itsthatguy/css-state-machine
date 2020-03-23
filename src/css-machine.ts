@@ -73,13 +73,13 @@ export default class CSSMachine {
     head.appendChild(style);
   }
 
-  static addClass(selector: Selector, sha: SHA) {
+  static addClass(selector: Selector, ...classes) {
     const elem = document.querySelector(selector);
-    return elem.classList.add(sha);
+    return elem.classList.add(...classes);
   }
 
-  static removeClass(selector: Selector , sha: SHA) {
+  static removeClass(selector: Selector , ...classes) {
     const elem = document.querySelector(selector);
-    return elem.classList.remove(sha);
+    return elem.classList.remove(...classes);
   }
 }
