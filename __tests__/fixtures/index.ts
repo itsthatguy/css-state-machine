@@ -22,6 +22,11 @@ class MyComponent {
     //   transitions from: :idle, to: :loading, after: {}
     //   transitions from: :hover, to: :loading, after: {}
     // end
+
+    /*
+      NOTE: This is just a test implementation for confirming the css machine works...
+            The final implementation would leverage the state machine for inject/eject
+    */
     const css1 = 'h1 { color: blue; } h2 { color: red; }';
     const sha1 = CSSMachine.generateSHA(css1);
     CSSMachine.inject('#root', css1)
