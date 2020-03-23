@@ -7,7 +7,7 @@ type CSSTuple = [SHA, CSS]
 
 export default class CSSMachine {
   static parse = flatten;
-  static cssCache: CSSTuple[] = [];
+  static cssPipeline: CSSTuple[] = [];
 
   // returns a tuple: [SHA, CSS]
   static generateCSS (selector: Selector, css: CSS): CSSTuple {
@@ -30,38 +30,38 @@ export default class CSSMachine {
     return 'csm-' + (hash >>> 0).toString(16);
   }
 
-  static cacheExists(SHA) {
-    for (let tuple of this.cssCache) {
+  static inPipeline(SHA) {
+    for (let tuple of this.cssPipeline) {
       if (tuple[0] == SHA) return true
     }
   }
 
-  static addCache(tuple) {
-    const exists = this.cacheExists(tuple[1]);
-    if (!exists) this.cssCache.push(tuple);
+  static addToPipeline(tuple) {
+    const exists = this.inPipeline(tuple[0]);
+    if (!exists) this.cssPipeline.push(tuple);
   }
 
-  static removeCache(tuple) {
-    const newCache = this.cssCache.filter(([sha, _]) => sha !== tuple[0]);
-    this.cssCache = newCache
-    return this.cssCache;
+  static removeFromPipeline(tuple) {
+    const newCache = this.cssPipeline.filter(([sha, _]) => sha !== tuple[0]);
+    this.cssPipeline = newCache
+    return this.cssPipeline;
   }
 
   static inject(selector, css) {
     const tuple = this.generateCSS(selector, css);
-    this.addCache(tuple);
+    this.addToPipeline(tuple);
     this.updateStyle();
   }
 
   static eject(selector, css) {
     const tuple = this.generateCSS(selector, css);
-    this.removeCache(tuple);
+    this.removeFromPipeline(tuple);
     this.updateStyle();
   }
 
   static updateStyle() {
     const head = document.getElementsByTagName('head')[0];
-    const cssContent: CSS = this.cssCache.reduce((result, [_, css]) => result + css, '');
+    const cssContent: CSS = this.cssPipeline.reduce((result, [_, css]) => result + css, '');
 
     const existingStyle = document.querySelector(`style.csm`);
 
