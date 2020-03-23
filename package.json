@@ -1,0 +1,43 @@
+{
+  "name": "css-state-machine",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server",
+    "start": "webpack",
+    "build": "npm run clean && $(npm bin)/tsc --project tsconfig.json",
+    "clean": "rm -rf ./dist",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@types/jest": "^21.1.6",
+    "@types/node": "^8.0.53",
+    "@types/webpack": "^3.8.1",
+    "awesome-typescript-loader": "^5.2.1",
+    "babel-loader": "^8.1.0",
+    "case-sensitive-paths-webpack-plugin": "^2.1.1",
+    "html-webpack-plugin": "^4.0.0",
+    "jest": "^25.1.0",
+    "progress-bar-webpack-plugin": "^1.10.0",
+    "ts-jest": "^25.2.1",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.6.1",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.7.2",
+    "webpack-merge": "^4.1.0"
+  },
+  "dependencies": {
+    "@types/i18next": "^8.4.2",
+    "copy-webpack-plugin": "^5.1.1",
+    "css-flatten": "^1.0.1",
+    "loader-utils": "^1.1.0",
+    "lodash": "^4.17.4"
+  }
+}
