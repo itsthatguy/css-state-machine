@@ -18,21 +18,12 @@ const idle = `
 `;
 
 const active = `
-  animation: colorchange 10s infinit;
+  animation: colorchange 10s infinite;
   .active-state {
     span.active { display: inline-block; }
   }
 
   button.active { background-color: green; }
-
-  @keyframes colorchange
-  {
-    0%   {background: red;}
-    25%  {background: yellow;}
-    50%  {background: blue;}
-    75%  {background: green;}
-    100% {background: red;}
-  }
 `;
 
 @target('.pill')
