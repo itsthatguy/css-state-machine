@@ -54,9 +54,9 @@ class MyComponent extends CSMStateComponent {
 
     this.setState('idle');
 
-    document.querySelector('button.loading').addEventListener('click', () => this.setState('loading'));
-    document.querySelector('button.idle').addEventListener('click', () => this.setState('idle'));
-    document.querySelector('button.active').addEventListener('click', () => this.setState('active'));
+    document.querySelector('button.loading').addEventListener('click', () => this.setLoading());
+    document.querySelector('button.idle').addEventListener('click', () => this.setIdle());
+    document.querySelector('button.active').addEventListener('click', () => this.setActive());
   }
 
   @event('loading')

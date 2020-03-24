@@ -40,7 +40,6 @@ export class CSMStateComponent {
   }
 
   setState(name) {
-    console.log(this);
     CSM.removeClass(this.target, this.getSHA(this.state))
     CSM.addClass(this.target, this.getSHA(name))
     this.state = name;
@@ -84,6 +83,13 @@ export function event(name, opts?) {
       ...t.stateMethods,
       [name]: d.value,
     };
+
+    const original = d.value;
+    d.value = function(...args) {
+      console.log('setState:', name);
+      this.setState(name);
+      return original(...args);
+    }
 
     return d;
   }
