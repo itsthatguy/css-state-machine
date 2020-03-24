@@ -6,7 +6,7 @@ const loading = `
     span.loading { display: inline-block; }
   }
 
-  button.loading { background-color: green; }
+  button.loading { background-color: var(--yellow); }
 `;
 
 const idle = `
@@ -14,19 +14,33 @@ const idle = `
     span.idle { display: inline-block; }
   }
 
-  button.idle { background-color: green; }
+  button.idle { background-color: var(--yellow); }
 `;
 
 const active = `
-  animation: colorchange 10s infinite;
+  h1, h2, .active-state {
+    color: var(--dark);
+  }
+
   .active-state {
     span.active { display: inline-block; }
   }
 
-  button.active { background-color: green; }
+  button.active { background-color: var(--yellow); }
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    animation: colorchange 10s infinite;
+    z-index: -1;
+  }
 `;
 
-@target('.pill')
+@target('.root')
 // possibly add css or classNames to @state() calls
 @state('loading', { initial: true, css: loading })
 @state('idle', { css: idle })
