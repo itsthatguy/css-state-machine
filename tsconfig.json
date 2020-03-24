@@ -2,6 +2,8 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "lib": ["dom", "es2015", "es2016"],
     "module": "commonjs",
     "moduleResolution": "node",
@@ -11,14 +13,14 @@
     "sourceMap": true,
     "sourceRoot": "dist",
     "stripInternal": true,
-    "target": "es5"
+    "target": "ES5"
   },
   "include": [
-    "./src"
+    "./src",
+    "./__tests__"
   ],
   "exclude": [
-    "node_modules",
-    "__tests__/fixtures/**/*"
+    "node_modules"
   ],
   "awesomeTypescriptLoaderOptions": {
     "useBabel": true,

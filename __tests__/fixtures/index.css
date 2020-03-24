@@ -1,0 +1,14 @@
+.pill {
+  padding: 20px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgba(0,0,0, 0.8);
+  text-align: center;
+}
+
+.pill .active-state {
+  height: 1.5em;
+}
+
+.pill .active-state > span {
+  display: none;
+}

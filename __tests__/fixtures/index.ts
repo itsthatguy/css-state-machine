@@ -1,65 +1,75 @@
-import CSM from '../../src/index';
-import CSSMachine from '../../src/css-machine';
-import { isDeleteExpression } from 'typescript';
+import './index.css';
+import CSM, { state, transition, event, CSMStateComponent, target } from '../../src/index';
 
-class MyComponent {
+const loading = `
+  .active-state {
+    span.loading { display: inline-block; }
+  }
+
+  button.loading { background-color: green; }
+`;
+
+const idle = `
+  .active-state {
+    span.idle { display: inline-block; }
+  }
+
+  button.idle { background-color: green; }
+`;
+
+const active = `
+  animation: colorchange 10s infinit;
+  .active-state {
+    span.active { display: inline-block; }
+  }
+
+  button.active { background-color: green; }
+
+  @keyframes colorchange
+  {
+    0%   {background: red;}
+    25%  {background: yellow;}
+    50%  {background: blue;}
+    75%  {background: green;}
+    100% {background: red;}
+  }
+`;
+
+@target('.pill')
+// possibly add css or classNames to @state() calls
+@state('loading', { initial: true, css: loading })
+@state('idle', { css: idle })
+@state('active', { css: active })
+class MyComponent extends CSMStateComponent {
   name: string;
-  state: CSM;
 
   constructor() {
-    console.log('new MyComponent');
-    this.name = "MyComponent";
+    super();
+    this.name = 'MyComponent';
 
-    // state :loading
-    // state :hover
-    // state :idle
+    this.setState('idle');
 
-    // event :load do
-    //   before do
-    //     // something
-    //   end
-
-    //   transitions from: :idle, to: :loading, after: {}
-    //   transitions from: :hover, to: :loading, after: {}
-    // end
-
-    /*
-      NOTE: This is just a test implementation for confirming the css machine works...
-            The final implementation would leverage the state machine for inject/eject
-    */
-    const css1 = CSSMachine.generateCSS('.root', 'h1 { color: blue; } h2 { color: red; }');
-    const css2 = CSSMachine.generateCSS('.root', 'h1 { color: green; } h2 { color: green; }');
-    const css3 = CSSMachine.generateCSS('.root', 'h1 { color: pink; } h2 { color: orange; }');
-
-    const second1 = CSSMachine.generateCSS('.second', 'h1, h2 { color: purple; }');
-    const second2 = CSSMachine.generateCSS('.second', 'h1, h2 { color: yellow; }');
-    const second3 = CSSMachine.generateCSS('.second', 'h1, h2 { color: blue; }');
-
-    CSSMachine.addToPipeline(css1);
-    CSSMachine.addToPipeline(css2);
-    CSSMachine.addToPipeline(css3);
-
-    CSSMachine.addToPipeline(second1);
-    CSSMachine.addToPipeline(second2);
-    CSSMachine.addToPipeline(second3);
-
-    CSSMachine.updateStyle();
-
-    CSSMachine.addClass('.root', css1[0]);
-    CSSMachine.addClass('.second', second1[0]);
-
-    setTimeout(() => {
-      CSSMachine.removeClass('.root', css1[0]);
-      CSSMachine.addClass('.root', css2[0]);
-      CSSMachine.addClass('.second', second2[0]);
-
-      setTimeout(() => {
-        CSSMachine.removeClass('.root', css2[0]);
-        CSSMachine.addClass('.root', css3[0]);
-        CSSMachine.addClass('.second', second3[0]);
-      }, 3000);
-    }, 3000);
+    document.querySelector('button.loading').addEventListener('click', () => this.setState('loading'));
+    document.querySelector('button.idle').addEventListener('click', () => this.setState('idle'));
+    document.querySelector('button.active').addEventListener('click', () => this.setState('active'));
   }
+
+  @event('loading')
+  @transition({ from: 'idle', to: 'loading', duration: 3000 })
+  @transition({ from: 'active', to: 'loading', duration: 3000 })
+  setLoading() {}
+
+  @event('idle')
+  @transition({ from: 'loading', to: 'idle' })
+  @transition({ from: 'active', to: 'idle' })
+  setIdle() {}
+
+  @event('active')
+  @transition({ from: 'idle', to: 'active' })
+  @transition({ from: 'loading', to: 'active' })
+  setActive() {}
 }
 
-export default new MyComponent();
+export default {}
+
+window.onload = () => new MyComponent();

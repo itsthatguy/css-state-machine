@@ -1,108 +1,96 @@
-
+import CSM from './css-machine';
 export default class CSSStateMachine {
   states: any[];
   queue: any[];
 
   constructor(states) {
-    this.states = states;
     this.queue = [];
   }
 }
 
-const idleCSS = `
-  h1 { color: black; }
-  h2 { color: black; }
-`;
+type stateOptions = {
+  sha?: string;
+  css?: string;
+  selector?: string;
+}
 
-const loadingCSS = `
-  h1 { color: red; }
-  h2 { color: blue; }
-`;
+export class CSMStateComponent {
+  state: string;
+  states: { [key in string]: stateOptions };
+  stateMethods: any;
+  events: any[];
+  target: string;
+  queue: any[];
 
-const runningCSS = `
-  h1 { color: green; }
-  h2 { color: green; }
-`;
+  constructor() {
+    for (let [key, value] of Object.entries(this.states)) {
+      const tuple = CSM.generateCSS(this.target, value.css)
+      value.sha = tuple[0];
+      CSM.addToPipeline(tuple);
 
-/*
-  1. definition of the discreet states that the component can take
-    - name of state
-    - visual description of state
+      if (key == this.state) {
+        CSM.addClass(this.target, tuple[0])
+      }
+    }
+    CSM.updateStyle()
+  }
 
-  2. define triggers (events)
+  getSHA(name) {
+    return this.states[name].sha
+  }
 
-  3. how do you transition between
-    - where is it general, and specific
+  setState(name) {
+    console.log(this);
+    CSM.removeClass(this.target, this.getSHA(this.state))
+    CSM.addClass(this.target, this.getSHA(name))
+    this.state = name;
+  }
+}
 
-*/
+export function target(selector) {
+  return function(constructor: any) {
+    constructor.prototype.target = selector;
+    constructor.target = selector;
+  }
+}
 
-//   handleTransition(state) {
-//     if (this.queue.length() > 0) {
-//       this.cancelTransition()
-//     }
-//     for (let s of state.on) {
-//       this.addToQueue(s);
-//     }
-//   }
+type StateOptions = {
+  initial?: boolean;
+  css?: string;
+}
 
-//   addTransition() {
-//     // cleanup current queue/timeouts
-//   }
+export function state(name, options?: StateOptions) {
+  let opts = options || {};
 
-//   addToQueue(state) {
-//     this.queue.push(() => {
-//       state.fn(s.args)
-//       this.queue.pop()
-//     })
-//   }
+  return function(constructor: Function) {
+    if (opts.initial) {
+      constructor.prototype.state = name
+    } else if (!constructor.prototype.state) {
+      constructor.prototype.state = name
+    }
 
-//   removeFromQueue(state) {
-//     for (let s of state.on) {
-//       if s == state {
-//         // remove s from queue
-//       }
-//     }
-//   }
-// }
+    constructor.prototype.states = {
+      ...constructor.prototype.states,
+      [name]: {
+        ...(opts.css && { css: opts.css })
+      }
+    }
+  }
+}
 
-// let to = setTimeout(() => "", 1600)
+export function event(name, opts?) {
+  return (t, n, d) => {
+    t.stateMethods = {
+      ...t.stateMethods,
+      [name]: d.value,
+    };
 
-// clearTimeout(to)
+    return d;
+  }
+}
 
-// // let foo = new CSSStateMachine([
-// //   { name: 'idle', from: ['loading', 'active', 'hover'] },
-// //   { name: 'loading', from: ['idle', 'active', 'hover'], to: 'idle' },
-// //   { name: 'active', },
-// //   { name: 'hover', },
-// // ])
-
-// let holding = (props) => `
-//   animation-name: fade-in;
-//   animation-duration: ${props.duration}ms;
-// `
-// let myStates = [
-//   name: 'loading'
-//   on: [
-//     { fn: holding, args: { duration: 3600 }, target: '.hold-please' },
-//     idle,
-//   ],
-//   out: [
-//     '.fade-out',
-//   ]
-// }
-
-
-// .loading-idle {
-//   color: red;
-//   opacity: 1;
-// }
-
-// .loading {
-//   animation-name: fade-in;
-//   animation-duration: 3.6s;
-// }
-
-// @keyframes fade-in {
-//   0% { opacity: 0; }
-//   100% { opacity: 1; }
-// }
+export function transition(opts) {
+  return function(t, n, d) {
+    return d;
+  }
+}
