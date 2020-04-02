@@ -1,6 +1,7 @@
 import { resolve } from 'path';
 import * as webpack from 'webpack';
 import * as merge from 'webpack-merge';
+import * as MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
 import * as ProgressBarPlugin from 'progress-bar-webpack-plugin';
@@ -28,27 +29,25 @@ const app = {
   },
   module: {
     rules: [
-      // {
-      //   test: /\.tsx?$/,
-      //   exclude: /(node_modules)/,
-      //   use: {
-      //     loader: resolve(__dirname, './src/i18n-json-webpack-loader.ts'),
-      //     options: {
-      //       translationFunction: 't'
-      //     }
-      //   }
-      // },
       {
         test: /\.tsx?$/,
         loader: ['babel-loader', 'awesome-typescript-loader'],
         exclude: [/(node_modules)/],
       },
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
     ]
   },
   plugins: [
+    new ProgressBarPlugin(),
     new CaseSensitivePathsPlugin(),
     new webpack.NamedModulesPlugin(),
     new CheckerPlugin(),
+    new MiniCssExtractPlugin({
+      filename: '[name].css'
+    }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: '__tests__/fixtures/index.html',
@@ -62,7 +61,6 @@ const app = {
             : JSON.stringify('development'),
       },
     }),
-    new ProgressBarPlugin(),
   ],
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
